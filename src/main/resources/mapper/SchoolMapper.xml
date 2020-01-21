@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ricky.mapper.SchoolMapper">
+
+    <resultMap id="schoolDetailResult" type="com.ricky.domain.School" autoMapping="true">
+        <id property="id" column="id"/>
+        <result property="name" column="sch_name"/>
+        <collection property="students" ofType="com.ricky.domain.Student"
+                    resultMap="studentDetailResult" columnPrefix="stu_">
+        </collection>
+    </resultMap>
+    <resultMap id="studentDetailResult" type="com.ricky.domain.Student" autoMapping="true">
+        <id property="id" column="id"/>
+        <collection property="subjects" ofType="com.ricky.domain.Subject"
+                    columnPrefix="sub_" autoMapping="true">
+        </collection>
+    </resultMap>
+
+    <resultMap id="schoolResult" type="com.ricky.domain.School">
+        <id property="id" column="id"/>
+        <collection property="students" javaType="ArrayList" column="id" ofType="com.ricky.domain.Student"
+                    select="findStudentById"/>
+    </resultMap>
+    <resultMap id="studentResult" type="com.ricky.domain.Student">
+        <id property="id" column="id"/>
+        <result property="schoolId" column="school_id"/>
+        <collection property="subjects" javaType="ArrayList" column="id" ofType="com.ricky.domain.Subject"
+                    select="findSubjectById"/>
+    </resultMap>
+    <resultMap id="subjectResult" type="com.ricky.domain.Subject">
+        <id property="id" column="id"/>
+        <result property="studentId" column="student_id"/>
+    </resultMap>
+
+    <select id="findById" resultMap="schoolDetailResult">
+        select
+        sch.id id, sch.name sch_name,
+        stu.id stu_id, stu.name stu_name, stu.school_id stu_schoolId,
+        sub.id stu_sub_id, sub.name stu_sub_name, sub.category stu_sub_category, sub.student_id stu_sub_studentId
+        from school sch
+        left join student stu on stu.school_id = sch.id
+        left join subject sub on sub.student_id = stu.id
+        where sch.id = #{id}
+    </select>
+
+    <select id="findSchoolById" resultMap="schoolResult">
+        select id, name from school where id = #{id}
+    </select>
+    <select id="findStudentById" resultMap="studentResult">
+        select id, name, school_id from student where school_id = #{id}
+    </select>
+    <select id="findSubjectById" resultMap="subjectResult">
+        select id, name, category, student_id from subject where student_id = #{id}
+    </select>
+
+    <insert id="save" parameterType="School" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into school(name) values(#{name})
+    </insert>
+
+</mapper>

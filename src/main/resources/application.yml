@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    type: org.h2.jdbcx.JdbcDataSource
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=FALSE
+    username: ricky
+    password:
+    schema: classpath*:sql/init_schema.sql
+#    data: classpath:sql/data.sql
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml
+  type-aliases-package: com.ricky.domain
+logging:
+  level:
+    com.ricky.mapper: DEBUG
